@@ -176,6 +176,7 @@ func _open_save_dialog() -> void:
 	if _stream == null:
 		return
 	_save_dialog.current_file = _clean_name() + ".wav"
+	_save_dialog.use_native_dialog = true
 	_save_dialog.popup_centered(Vector2i(760, 500))
 
 

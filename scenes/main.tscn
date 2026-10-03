@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://2g35chcf6fv2"]
 
-[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
-[ext_resource type="Script" path="res://scripts/wave_view.gd" id="2_waveview"]
+[ext_resource type="Script" uid="uid://q2bex3q55k12" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://cevehragnwta5" path="res://scripts/wave_view.gd" id="2_waveview"]
 
-[node name="Main" type="Control"]
+[node name="Main" type="Control" unique_id=1452099391]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Center" type="CenterContainer" parent="." unique_id=1344388581]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,98 +20,96 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="PanelContainer" parent="Center"]
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=483632249]
 layout_mode = 2
 
-[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=1778921819]
 layout_mode = 2
 theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 22
 theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 22
 
-[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=737240880]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="Title" type="Label" parent="Center/Panel/Margin/VBox" unique_id=127383514]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "合成音效生成器"
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="Subtitle" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1288342994]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.68, 0.75, 1)
 theme_override_font_sizes/font_size = 12
 text = "逐采样合成 → AudioStreamWAV · 22050 Hz · 16-bit PCM · 单声道"
 horizontal_alignment = 1
 
-[node name="Grid" type="GridContainer" parent="Center/Panel/Margin/VBox"]
+[node name="Grid" type="GridContainer" parent="Center/Panel/Margin/VBox" unique_id=1031724874]
 layout_mode = 2
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 8
 columns = 4
 
-[node name="LWave" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="LWave" type="Label" parent="Center/Panel/Margin/VBox/Grid" unique_id=555191702]
 layout_mode = 2
-vertical_alignment = 1
-horizontal_alignment = 2
 text = "波形"
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="Wave" type="OptionButton" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="Wave" type="OptionButton" parent="Center/Panel/Margin/VBox/Grid" unique_id=750366678]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 tooltip_text = "sine 柔和 / square 刺（机械感）/ tri 介于两者 / saw 明亮锋利 / noise 白噪声（与音高无关）"
 
-[node name="LFreq" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="LFreq" type="Label" parent="Center/Panel/Margin/VBox/Grid" unique_id=906063591]
 layout_mode = 2
-vertical_alignment = 1
-horizontal_alignment = 2
 text = "起始频率"
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="Freq" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="Freq" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid" unique_id=1507193512]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 max_value = 8000.0
-step = 1.0
 value = 880.0
 suffix = " Hz"
 
-[node name="LFreqEnd" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="LFreqEnd" type="Label" parent="Center/Panel/Margin/VBox/Grid" unique_id=1036788828]
 layout_mode = 2
-vertical_alignment = 1
-horizontal_alignment = 2
 text = "结束频率"
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="FreqEnd" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="FreqEnd" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid" unique_id=887502339]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 tooltip_text = "大于 0 时从起始频率滑到该频率（上扬/下坠音效）；≤ 0 表示不滑音"
 min_value = -1.0
 max_value = 8000.0
-step = 1.0
 value = -1.0
 suffix = " Hz"
 
-[node name="LCurve" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="LCurve" type="Label" parent="Center/Panel/Margin/VBox/Grid" unique_id=1572612408]
 layout_mode = 2
-vertical_alignment = 1
-horizontal_alignment = 2
 text = "滑音曲线"
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="Curve" type="OptionButton" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="Curve" type="OptionButton" parent="Center/Panel/Margin/VBox/Grid" unique_id=475870177]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 tooltip_text = "线性：频率匀速变化；指数：按音高等比变化，听感更均匀自然（需结束频率 > 0）"
 
-[node name="LDur" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="LDur" type="Label" parent="Center/Panel/Margin/VBox/Grid" unique_id=253208554]
 layout_mode = 2
-vertical_alignment = 1
-horizontal_alignment = 2
 text = "时长"
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="Dur" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="Dur" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid" unique_id=1688784710]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 min_value = 0.05
@@ -120,13 +118,13 @@ step = 0.05
 value = 0.35
 suffix = " s"
 
-[node name="LDecay" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="LDecay" type="Label" parent="Center/Panel/Margin/VBox/Grid" unique_id=1962500551]
 layout_mode = 2
-vertical_alignment = 1
-horizontal_alignment = 2
 text = "衰减 decay"
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="Decay" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="Decay" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid" unique_id=819561859]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 tooltip_text = "指数衰减速率，越大声音消失越快"
@@ -135,73 +133,73 @@ max_value = 60.0
 step = 0.5
 value = 12.0
 
-[node name="LVol" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="LVol" type="Label" parent="Center/Panel/Margin/VBox/Grid" unique_id=903612095]
 layout_mode = 2
-vertical_alignment = 1
-horizontal_alignment = 2
 text = "音量"
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="Vol" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="Vol" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid" unique_id=534182214]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 max_value = 1.0
 step = 0.05
 value = 0.5
 
-[node name="LFileName" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="LFileName" type="Label" parent="Center/Panel/Margin/VBox/Grid" unique_id=1799471173]
 layout_mode = 2
-vertical_alignment = 1
-horizontal_alignment = 2
 text = "文件名"
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="FileName" type="LineEdit" parent="Center/Panel/Margin/VBox/Grid"]
+[node name="FileName" type="LineEdit" parent="Center/Panel/Margin/VBox/Grid" unique_id=1644351683]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
 tooltip_text = "快速导出到 sounds/<文件名>.wav，只保留字母、数字、-、_"
 text = "blip"
 placeholder_text = "默认 blip"
 
-[node name="WaveView" type="Control" parent="Center/Panel/Margin/VBox"]
+[node name="WaveView" type="Control" parent="Center/Panel/Margin/VBox" unique_id=576899341]
 custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 script = ExtResource("2_waveview")
 
-[node name="Presets" type="HFlowContainer" parent="Center/Panel/Margin/VBox"]
+[node name="Presets" type="HFlowContainer" parent="Center/Panel/Margin/VBox" unique_id=1343765474]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 8
 
-[node name="LPresets" type="Label" parent="Center/Panel/Margin/VBox/Presets"]
+[node name="LPresets" type="Label" parent="Center/Panel/Margin/VBox/Presets" unique_id=2026333428]
 layout_mode = 2
-vertical_alignment = 1
 text = "预设："
+vertical_alignment = 1
 
-[node name="Buttons" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+[node name="Buttons" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=1666625949]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PlayButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons"]
+[node name="PlayButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons" unique_id=1572790158]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "合成并播放（空格）"
 
-[node name="PlayOnlyButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons"]
+[node name="PlayOnlyButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons" unique_id=1262210680]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "仅播放"
 
-[node name="ExportButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons"]
+[node name="ExportButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons" unique_id=274928148]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "导出 WAV"
 
-[node name="SaveAsButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons"]
+[node name="SaveAsButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons" unique_id=964663592]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "另存为…"
 
-[node name="Info" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="Info" type="Label" parent="Center/Panel/Margin/VBox" unique_id=805385880]
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.8, 0.7, 1)
@@ -209,4 +207,4 @@ theme_override_font_sizes/font_size = 12
 text = "生成中…"
 autowrap_mode = 3
 
-[node name="Player" type="AudioStreamPlayer" parent="."]
+[node name="Player" type="AudioStreamPlayer" parent="." unique_id=1136416634]
