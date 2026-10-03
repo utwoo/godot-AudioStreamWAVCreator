@@ -1,26 +1,27 @@
 extends Control
 ## 可定制合成音效生成器：在界面输入参数 → _tone() 逐采样合成 16-bit PCM
-## → 封装为 AudioStreamWAV 播放/预览 → 需要时 save_to_wav() 导出 .wav 文件。
+## → 封装为 AudioStreamWAV 播放/预览 → save_to_wav() 导出 .wav 文件。
 
 const WAVES := ["sine", "square", "tri", "saw", "noise"]
 const SETTINGS_PATH := "user://settings.cfg"
 # 用 preload 而不是依赖 class_name 全局类：新脚本要等编辑器重扫后才会进全局类缓存
 const WaveViewScript := preload("res://scripts/wave_view.gd")
 
-## 常用音效预设：点击后自动填入界面参数并生成
+## 常用音效预设：点击后自动填入界面参数并生成（curve: 0=线性滑音，1=指数滑音）
 const PRESETS := [
-	{"name": "经典 Blip", "freq": 880.0, "freq_end": -1.0, "dur": 0.35, "decay": 12.0, "wave": "sine", "vol": 0.5},
-	{"name": "上扬 Launch", "freq": 220.0, "freq_end": 990.0, "dur": 0.3, "decay": 5.0, "wave": "square", "vol": 0.35},
-	{"name": "下坠 Drain", "freq": 880.0, "freq_end": 110.0, "dur": 0.45, "decay": 5.0, "wave": "tri", "vol": 0.5},
-	{"name": "敲击 Hit", "freq": 180.0, "freq_end": -1.0, "dur": 0.12, "decay": 40.0, "wave": "square", "vol": 0.5},
-	{"name": "金币 Coin", "freq": 988.0, "freq_end": 1319.0, "dur": 0.3, "decay": 8.0, "wave": "square", "vol": 0.3},
-	{"name": "爆炸 Boom", "freq": 100.0, "freq_end": -1.0, "dur": 0.5, "decay": 9.0, "wave": "noise", "vol": 0.6},
+	{"name": "经典 Blip", "freq": 880.0, "freq_end": -1.0, "curve": 0, "dur": 0.35, "decay": 12.0, "wave": "sine", "vol": 0.5},
+	{"name": "上扬 Launch", "freq": 220.0, "freq_end": 990.0, "curve": 0, "dur": 0.3, "decay": 5.0, "wave": "square", "vol": 0.35},
+	{"name": "下坠 Drain", "freq": 880.0, "freq_end": 110.0, "curve": 1, "dur": 0.45, "decay": 5.0, "wave": "tri", "vol": 0.5},
+	{"name": "敲击 Hit", "freq": 180.0, "freq_end": -1.0, "curve": 0, "dur": 0.12, "decay": 40.0, "wave": "square", "vol": 0.5},
+	{"name": "金币 Coin", "freq": 988.0, "freq_end": 1319.0, "curve": 0, "dur": 0.3, "decay": 8.0, "wave": "square", "vol": 0.3},
+	{"name": "爆炸 Boom", "freq": 100.0, "freq_end": -1.0, "curve": 0, "dur": 0.5, "decay": 9.0, "wave": "noise", "vol": 0.6},
 ]
 
 @onready var _player: AudioStreamPlayer = $Player
 @onready var _wave: OptionButton = $Center/Panel/Margin/VBox/Grid/Wave
 @onready var _freq: SpinBox = $Center/Panel/Margin/VBox/Grid/Freq
 @onready var _freq_end: SpinBox = $Center/Panel/Margin/VBox/Grid/FreqEnd
+@onready var _curve: OptionButton = $Center/Panel/Margin/VBox/Grid/Curve
 @onready var _dur: SpinBox = $Center/Panel/Margin/VBox/Grid/Dur
 @onready var _decay: SpinBox = $Center/Panel/Margin/VBox/Grid/Decay
 @onready var _vol: SpinBox = $Center/Panel/Margin/VBox/Grid/Vol
@@ -29,11 +30,14 @@ const PRESETS := [
 @onready var _wave_view: WaveViewScript = $Center/Panel/Margin/VBox/WaveView
 
 var _stream: AudioStreamWAV
+var _save_dialog: FileDialog
 
 
 func _ready() -> void:
 	for w in WAVES:
 		_wave.add_item(w)
+	for c in ["线性", "指数"]:
+		_curve.add_item(c)
 	for p in PRESETS:
 		var b := Button.new()
 		b.text = p["name"]
@@ -42,6 +46,18 @@ func _ready() -> void:
 	$Center/Panel/Margin/VBox/Buttons/PlayButton.pressed.connect(_regenerate)
 	$Center/Panel/Margin/VBox/Buttons/PlayOnlyButton.pressed.connect(_play)
 	$Center/Panel/Margin/VBox/Buttons/ExportButton.pressed.connect(_export_wav)
+	$Center/Panel/Margin/VBox/Buttons/SaveAsButton.pressed.connect(_open_save_dialog)
+	# 结束频率 ≤ 0 时不滑音，曲线选项没有意义，直接禁用
+	_freq_end.value_changed.connect(_update_curve_enabled)
+	_update_curve_enabled(_freq_end.value)
+	# 「另存为…」对话框：把当前音效保存到任意位置
+	_save_dialog = FileDialog.new()
+	_save_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	_save_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	_save_dialog.filters = ["*.wav ; WAV 音频"]
+	_save_dialog.title = "导出 WAV"
+	_save_dialog.file_selected.connect(_save_as)
+	add_child(_save_dialog)
 	# 首次运行（没有参数存档）时顺便导出一份，让用户开箱即拿到 WAV 文件
 	var first_run := not FileAccess.file_exists(SETTINGS_PATH)
 	_load_settings()
@@ -60,10 +76,15 @@ func _play() -> void:
 	_player.play()
 
 
+func _update_curve_enabled(freq_end: float) -> void:
+	_curve.disabled = freq_end <= 0.0
+
+
 ## 读取界面参数 → 合成 → 更新预览 → 播放（不写文件，导出走 _export_wav）
 func _regenerate() -> void:
 	_stream = _tone(_freq.value, _dur.value, _decay.value,
-			WAVES[_wave.selected], _vol.value, _freq_end.value)
+			WAVES[_wave.selected], _vol.value, _freq_end.value,
+			"linear" if _curve.selected == 0 else "exp")
 	_player.stream = _stream
 	_wave_view.set_samples(_extract_samples(_stream))
 	_save_settings()
@@ -75,13 +96,14 @@ func _apply_preset(p: Dictionary) -> void:
 	_wave.select(WAVES.find(p.wave))
 	_freq.value = p.freq
 	_freq_end.value = p.freq_end
+	_curve.select(int(p.get("curve", 0)))
 	_dur.value = p.dur
 	_decay.value = p.decay
 	_vol.value = p.vol
 	_regenerate()
 
 
-func _tone(freq: float, dur: float, decay: float, wave := "sine", vol := 0.5, freq_end := -1.0) -> AudioStreamWAV:
+func _tone(freq: float, dur: float, decay: float, wave := "sine", vol := 0.5, freq_end := -1.0, curve := "linear") -> AudioStreamWAV:
 	# 采样率 22050Hz：对短音效足够清晰，数据量比 CD 标准 44100Hz 少一半
 	var rate := 22050
 	# 总采样点数 = 时长 × 采样率
@@ -95,11 +117,14 @@ func _tone(freq: float, dur: float, decay: float, wave := "sine", vol := 0.5, fr
 	for i in n:
 		# 当前采样点对应的时间（秒）
 		var t := float(i) / float(rate)
-		# 频率：freq_end > 0 时随时间从 freq 线性滑向 freq_end
-		# （launch 的上扬音、drain 的下坠音都靠这个参数）
+		# 频率：freq_end > 0 时随时间从 freq 滑向 freq_end
+		# （launch 的上扬音、drain 的下坠音都靠这个参数）。
+		# 线性：频率匀速变化；指数：频率等比变化——人耳对音高的感知是对数的，
+		# 指数滑音的听感更均匀自然，下坠音尤其明显（界面限制频率 ≥ 20Hz，不会除零）
 		var f := freq
 		if freq_end > 0.0:
-			f = lerpf(freq, freq_end, t / dur)
+			var k := t / dur
+			f = lerpf(freq, freq_end, k) if curve == "linear" else freq * pow(freq_end / freq, k)
 		# 每个采样点推进的相位量：一圈相位（2π）对应一个完整振动周期
 		phase += TAU * f / float(rate)
 		# 基础波形取正弦
@@ -147,6 +172,25 @@ func _export_wav() -> void:
 		_info.text = "导出失败（错误码 %d）：%s" % [err, path]
 
 
+func _open_save_dialog() -> void:
+	if _stream == null:
+		return
+	_save_dialog.current_file = _clean_name() + ".wav"
+	_save_dialog.popup_centered(Vector2i(760, 500))
+
+
+## 「另存为…」把当前音效写到任意位置；文件名输入框同步成这次的名字
+func _save_as(path: String) -> void:
+	if _stream == null:
+		return
+	var err := _stream.save_to_wav(path)
+	if err == OK:
+		_file_name.text = path.get_file().get_basename()
+		_info.text = "已导出 %s → %s" % [_describe(), ProjectSettings.globalize_path(path)]
+	else:
+		_info.text = "导出失败（错误码 %d）：%s" % [err, path]
+
+
 ## 从 16-bit PCM 数据还原归一化采样，供波形预览使用
 func _extract_samples(wav: AudioStreamWAV) -> PackedFloat32Array:
 	var bytes := wav.data
@@ -161,7 +205,8 @@ func _extract_samples(wav: AudioStreamWAV) -> PackedFloat32Array:
 func _describe() -> String:
 	var slide := ""
 	if _freq_end.value > 0.0:
-		slide = "，滑音 %d→%d Hz" % [_freq.value, _freq_end.value]
+		var curve_name := "线性" if _curve.selected == 0 else "指数"
+		slide = "，滑音 %d→%d Hz（%s）" % [_freq.value, _freq_end.value, curve_name]
 	return "%s %d Hz · %.2f 秒%s" % [WAVES[_wave.selected], _freq.value, _dur.value, slide]
 
 
@@ -183,6 +228,7 @@ func _load_settings() -> void:
 	_wave.select(clampi(int(cfg.get_value("params", "wave", 0)), 0, WAVES.size() - 1))
 	_freq.value = float(cfg.get_value("params", "freq", 880.0))
 	_freq_end.value = float(cfg.get_value("params", "freq_end", -1.0))
+	_curve.select(clampi(int(cfg.get_value("params", "curve", 0)), 0, 1))
 	_dur.value = float(cfg.get_value("params", "dur", 0.35))
 	_decay.value = float(cfg.get_value("params", "decay", 12.0))
 	_vol.value = float(cfg.get_value("params", "vol", 0.5))
@@ -194,6 +240,7 @@ func _save_settings() -> void:
 	cfg.set_value("params", "wave", _wave.selected)
 	cfg.set_value("params", "freq", _freq.value)
 	cfg.set_value("params", "freq_end", _freq_end.value)
+	cfg.set_value("params", "curve", _curve.selected)
 	cfg.set_value("params", "dur", _dur.value)
 	cfg.set_value("params", "decay", _decay.value)
 	cfg.set_value("params", "vol", _vol.value)

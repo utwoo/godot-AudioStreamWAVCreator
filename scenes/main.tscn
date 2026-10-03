@@ -87,12 +87,23 @@ text = "结束频率"
 [node name="FreqEnd" type="SpinBox" parent="Center/Panel/Margin/VBox/Grid"]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
-tooltip_text = "大于 0 时从起始频率线性滑到该频率（上扬/下坠音效）；≤ 0 表示不滑音"
+tooltip_text = "大于 0 时从起始频率滑到该频率（上扬/下坠音效）；≤ 0 表示不滑音"
 min_value = -1.0
 max_value = 8000.0
 step = 1.0
 value = -1.0
 suffix = " Hz"
+
+[node name="LCurve" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
+layout_mode = 2
+vertical_alignment = 1
+horizontal_alignment = 2
+text = "滑音曲线"
+
+[node name="Curve" type="OptionButton" parent="Center/Panel/Margin/VBox/Grid"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+tooltip_text = "线性：频率匀速变化；指数：按音高等比变化，听感更均匀自然（需结束频率 > 0）"
 
 [node name="LDur" type="Label" parent="Center/Panel/Margin/VBox/Grid"]
 layout_mode = 2
@@ -146,7 +157,7 @@ text = "文件名"
 [node name="FileName" type="LineEdit" parent="Center/Panel/Margin/VBox/Grid"]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
-tooltip_text = "导出到 sounds/<文件名>.wav，只保留字母、数字、-、_"
+tooltip_text = "快速导出到 sounds/<文件名>.wav，只保留字母、数字、-、_"
 text = "blip"
 placeholder_text = "默认 blip"
 
@@ -184,6 +195,11 @@ text = "仅播放"
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 text = "导出 WAV"
+
+[node name="SaveAsButton" type="Button" parent="Center/Panel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "另存为…"
 
 [node name="Info" type="Label" parent="Center/Panel/Margin/VBox"]
 custom_minimum_size = Vector2(0, 28)
